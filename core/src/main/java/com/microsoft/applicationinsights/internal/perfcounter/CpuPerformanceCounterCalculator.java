@@ -21,37 +21,39 @@
 
 package com.microsoft.applicationinsights.internal.perfcounter;
 
-import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.internal.logger.InternalLogger;
-import com.microsoft.applicationinsights.internal.system.SystemInformation;
-import com.microsoft.applicationinsights.telemetry.PerformanceCounterTelemetry;
-import com.microsoft.applicationinsights.telemetry.Telemetry;
-
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
+
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
 
 /**
  * Created by gupele on 12/12/2016.
  */
 public final class CpuPerformanceCounterCalculator {
     private final int numberOfCpus;
+    private final MBeanServer mBeanServer;
+    private final ObjectName osMxBeanName;
 
     private long prevUpTime, prevProcessCpuTime;
-
-    public CpuPerformanceCounterCalculator() {
-        com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+    
+    public CpuPerformanceCounterCalculator() throws MalformedObjectNameException, NullPointerException {
+        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
         numberOfCpus = operatingSystemMXBean.getAvailableProcessors();
+        mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        osMxBeanName = ObjectName.getInstance(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
     }
 
     public double getProcessCpuUsage() {
         double processCpuUsage;
         try {
             RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-            com.sun.management.OperatingSystemMXBean operatingSystemMXBean =
-                    (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
 
             long upTime = runtimeMXBean.getUptime();
-            long processCpuTime = operatingSystemMXBean.getProcessCpuTime();
+            long processCpuTime = getProcessCpuTime();
 
             if (prevUpTime > 0L && upTime > prevUpTime) {
                 long elapsedCpu = processCpuTime - prevProcessCpuTime;
@@ -67,5 +69,9 @@ public final class CpuPerformanceCounterCalculator {
         }
 
         return processCpuUsage;
+    }
+
+    private long getProcessCpuTime() throws Exception {
+        return (Long)mBeanServer.getAttribute(osMxBeanName, "ProcessCpuTime");
     }
 }

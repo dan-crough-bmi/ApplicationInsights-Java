@@ -24,6 +24,7 @@ package com.microsoft.applicationinsights.extensibility.initializer.docker;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.extensibility.TelemetryInitializer;
 import com.microsoft.applicationinsights.extensibility.initializer.docker.internal.*;
+import com.microsoft.applicationinsights.extensibility.initializer.docker.internal.Constants;
 import com.microsoft.applicationinsights.internal.logger.InternalLogger;
 import com.microsoft.applicationinsights.internal.util.LocalStringsUtils;
 import com.microsoft.applicationinsights.telemetry.Telemetry;
