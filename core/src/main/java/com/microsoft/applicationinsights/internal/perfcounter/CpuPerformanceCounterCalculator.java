@@ -48,10 +48,10 @@ public final class CpuPerformanceCounterCalculator {
         
         ObjectName beanName = null;
         try {
-            beanName = ObjectName.getInstance(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
-        } catch (Exception e) {
-            InternalLogger.INSTANCE.error("Error constructing CpuPerformanceCounterCalculator, unable to retrieve ObjectName for " + ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, e.getMessage());
-        }
+			beanName = ObjectName.getInstance(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+		} catch (Exception e) {
+			InternalLogger.INSTANCE.error("Error constructing CpuPerformanceCounterCalculator, unable to retrieve ObjectName for " + ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, e.getMessage());
+		}
         
         osMxBeanName = beanName;
     }
