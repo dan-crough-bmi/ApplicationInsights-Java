@@ -26,8 +26,9 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+
+import com.microsoft.applicationinsights.internal.logger.InternalLogger;
 
 
 /**
@@ -40,11 +41,19 @@ public final class CpuPerformanceCounterCalculator {
 
     private long prevUpTime, prevProcessCpuTime;
     
-    public CpuPerformanceCounterCalculator() throws MalformedObjectNameException, NullPointerException {
+    public CpuPerformanceCounterCalculator() {
         OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
         numberOfCpus = operatingSystemMXBean.getAvailableProcessors();
         mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        osMxBeanName = ObjectName.getInstance(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+        
+        ObjectName beanName = null;
+        try {
+			beanName = ObjectName.getInstance(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+		} catch (Exception e) {
+			InternalLogger.INSTANCE.error("Error constructing CpuPerformanceCounterCalculator, unable to retrieve ObjectName for " + ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, e.getMessage());
+		}
+        
+        osMxBeanName = beanName;
     }
 
     public double getProcessCpuUsage() {
